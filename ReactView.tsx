@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useApp } from "./hooks";
 import axios from "axios";
-import TurndownService from "turndown";
 import { googleDocsToMarkdown } from "docs-markdown";
 import { google } from "googleapis";
 import { writeFileSync } from "fs";
@@ -28,9 +27,9 @@ export const ReactView = () => {
 		docId: null,
 		accessToken: null,
 	});
-	const [currentFileContent, setCurrentFileContent] = React.useState("");
+	// const [currentFileContent, setCurrentFileContent] = React.useState("");
 	const [user, setUser] = React.useState(null);
-	const [docsData, setDocsData] = React.useState(null);
+	// const [docsData, setDocsData] = React.useState(null);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -72,128 +71,192 @@ export const ReactView = () => {
 		// }
 	};
 
-	const handleLoadTodo = () => {
-		axios("https://jsonplaceholder.typicode.com/todos?_limit=5")
-			.then((res) => {
-				// console.log(res.data);
+	// const handleLoadTodo = () => {
+	// 	axios("https://jsonplaceholder.typicode.com/todos?_limit=5")
+	// 		.then((res) => {
+	// 			// console.log(res.data);
 
-				setTodos(res.data);
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	};
+	// 			setTodos(res.data);
+	// 		})
+	// 		.catch((err) => {
+	// 			console.log(err);
+	// 		});
+	// };
 
-	useApp().workspace.on("editor-change", (editor) => {
-		const content = editor.getDoc().getValue();
-		setCurrentFileContent(content);
-	});
+	// useApp().workspace.on("editor-change", (editor) => {
+	// 	const content = editor.getDoc().getValue();
+	// 	setCurrentFileContent(content);
+	// });
 
 	const handleChangeData = (key: string, value: string) => {
 		setFormData({ ...formData, [key]: value });
 	};
-
-	const handleGetFileData = (fileName) => {
-		console.log(fileName);
-		// axios
-		// 	.put(`http://127.0.0.1:27123/vault/${fileName}`, docsData, {
-		// 		headers: {
-		// 			contentType: "text/markdown",
-		// 			Authorization:
-		// 				"Bearer 3a848ddc6c8e6ec3b8162d17fc49e63897d37fb478af1eb8bb31fb9a93d4ab96",
-		// 		},
-		// 	})
-		// 	.then((res) => {
-		// 		console.log(res.data);
-		// 	})
-		// 	.catch((err) => {
-		// 		console.log(err);
-		// 	});
-		fetch(`http://127.0.0.1:27123/vault/${fileName}`, {
-			method: "PUT",
+	const handlePushDocsFromActiveFile = () => {
+		axios(`http://127.0.0.1:27123/active`, {
 			headers: {
 				"Content-Type": "text/markdown",
 				Authorization:
 					"Bearer 3a848ddc6c8e6ec3b8162d17fc49e63897d37fb478af1eb8bb31fb9a93d4ab96",
 			},
-			body: `${docsData}`,
-		})
-			.then((res) => console.log(res))
-			.catch((err) => console.log(err));
-	};
-	const handleSetActiveFileData = () => {
-		fetch(`http://127.0.0.1:27123/active`, {
-			method: "PUT",
-			headers: {
-				"Content-Type": "text/markdown",
-				Authorization:
-					"Bearer 3a848ddc6c8e6ec3b8162d17fc49e63897d37fb478af1eb8bb31fb9a93d4ab96",
-			},
-			body: `${docsData}`,
-		})
-			.then((res) => console.log(res))
-			.catch((err) => console.log(err));
-	};
-
-	const handleConvertDocsToMd = async () => {
-		axios
-			.get(
-				"https://docs.googleapis.com/v1/documents/1X6bWJXptBwUzVAlyRcCyE82KDrjJlL2wxf2PHn3kQ8k",
-				{
-					headers: {
-						Authorization:
-							"Bearer ya29.a0AVvZVsqKCQO6saGlsU8CqXd6yRQbJeKC0trD5cFdoTBEKH7Pl_8K1QsWlkMhySy84UffPsXpFOoiNo5YC1uTYvt_c7E0Vy9qJjLOK0qtvz1mTsk8DKI2l3Q9abBa1NkGeJzUCrYBEtSPi50tSpG9l1rwFIetOirAaCgYKAUgSARISFQGbdwaI-UNkjQHNZeIXWGeXC0beBA0167",
-					},
-				}
-			)
-			.then((res) => {
-				console.log(res.data);
-
-				const markdown = googleDocsToMarkdown(res.data);
-				console.log({ markdown });
-				setDocsData(markdown);
-			})
-			.catch((err) => console.log(err));
-
-		// const file = await docs.documents.get({
-		// 	documentId: "1X6bWJXptBwUzVAlyRcCyE82KDrjJlL2wxf2PHn3kQ8k",
-		// 	auth: "AIzaSyAycxIgrLiZOa9chB9bgut3nRXcHPerdyg",
-		// });
-
-		// const markdown = googleDocsToMarkdown(file.data);
-		// console.log(markdown);
-	};
-
-	const handleContentSetToDocs = () => {
-		console.log({ currentFileContent });
-
-		fetch(
-			"https://docs.googleapis.com/v1/documents/1X6bWJXptBwUzVAlyRcCyE82KDrjJlL2wxf2PHn3kQ8k:batchUpdate",
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "text/markdown",
-					Authorization:
-						"Bearer ya29.a0AVvZVsr4SJQojDKK7KapT4hd5E1lpsjSOJrPpqT0RyFdhbJjuKuRC64039uG79HgU0hakOc55EjsEVuvizFy6NxRlYU8Fc14BgEvZVchvrafyj88eLeol8GRWSG7tWarZvLl1Tv_GjxggowQiPRJaIUINPUuaCgYKAa4SARISFQGbdwaI7R625W07hyXpPa6tbD6piA0163",
-				},
-				body: JSON.stringify({
-					request: [
-						{
-							replaceAllText: {
-								replaceText: `${currentFileContent}`,
-							},
+		}).then((activeFileRes) => {
+			console.log({
+				data: activeFileRes.data,
+				dataLen: activeFileRes.data.length,
+			});
+			axios
+				.get(
+					`https://docs.googleapis.com/v1/documents/${formData.docId}`,
+					{
+						headers: {
+							Authorization: `Bearer ${formData.accessToken}`,
 						},
-					],
-				}),
-			}
-		)
-			.then((res) => {
-				console.log(res);
-				// const markdown = googleDocsToMarkdown(res.data);
-				// console.log(markdown);
-			})
-			.catch((err) => console.log(err));
+					}
+				)
+				.then((res) => {
+					console.log(res.data);
+					axios
+						.post(
+							`https://docs.googleapis.com/v1/documents/${formData.docId}:batchUpdate`,
+							{
+								requests: [
+									{
+										deleteContentRange: {
+											range: {
+												startIndex: 1,
+												endIndex:
+													res.data.body.content[
+														res.data.body.content
+															.length - 1
+													].endIndex - 1,
+											},
+										},
+									},
+									{
+										insertText: {
+											location: {
+												index: 1,
+											},
+											text: activeFileRes.data,
+										},
+									},
+								],
+							},
+							{
+								headers: {
+									Authorization: `Bearer ${formData.accessToken}`,
+								},
+							}
+						)
+						.then((docsRes) => {
+							console.log(docsRes.data);
+						})
+						.catch((err) => console.log(err));
+				})
+				.catch((err) => console.log(err));
+		});
 	};
+
+	// const handleGetFileData = (fileName) => {
+	// 	console.log(fileName);
+	// 	// axios
+	// 	// 	.put(`http://127.0.0.1:27123/vault/${fileName}`, docsData, {
+	// 	// 		headers: {
+	// 	// 			contentType: "text/markdown",
+	// 	// 			Authorization:
+	// 	// 				"Bearer 3a848ddc6c8e6ec3b8162d17fc49e63897d37fb478af1eb8bb31fb9a93d4ab96",
+	// 	// 		},
+	// 	// 	})
+	// 	// 	.then((res) => {
+	// 	// 		console.log(res.data);
+	// 	// 	})
+	// 	// 	.catch((err) => {
+	// 	// 		console.log(err);
+	// 	// 	});
+	// 	fetch(`http://127.0.0.1:27123/vault/${fileName}`, {
+	// 		method: "PUT",
+	// 		headers: {
+	// 			"Content-Type": "text/markdown",
+	// 			Authorization:
+	// 				"Bearer 3a848ddc6c8e6ec3b8162d17fc49e63897d37fb478af1eb8bb31fb9a93d4ab96",
+	// 		},
+	// 		body: `${docsData}`,
+	// 	})
+	// 		.then((res) => console.log(res))
+	// 		.catch((err) => console.log(err));
+	// };
+	// const handleSetActiveFileData = () => {
+	// 	fetch(`http://127.0.0.1:27123/active`, {
+	// 		method: "PUT",
+	// 		headers: {
+	// 			"Content-Type": "text/markdown",
+	// 			Authorization:
+	// 				"Bearer 3a848ddc6c8e6ec3b8162d17fc49e63897d37fb478af1eb8bb31fb9a93d4ab96",
+	// 		},
+	// 		body: `${docsData}`,
+	// 	})
+	// 		.then((res) => console.log(res))
+	// 		.catch((err) => console.log(err));
+	// };
+
+	// const handleConvertDocsToMd = async () => {
+	// 	axios
+	// 		.get(
+	// 			"https://docs.googleapis.com/v1/documents/1X6bWJXptBwUzVAlyRcCyE82KDrjJlL2wxf2PHn3kQ8k",
+	// 			{
+	// 				headers: {
+	// 					Authorization:
+	// 						"Bearer ya29.a0AVvZVsqKCQO6saGlsU8CqXd6yRQbJeKC0trD5cFdoTBEKH7Pl_8K1QsWlkMhySy84UffPsXpFOoiNo5YC1uTYvt_c7E0Vy9qJjLOK0qtvz1mTsk8DKI2l3Q9abBa1NkGeJzUCrYBEtSPi50tSpG9l1rwFIetOirAaCgYKAUgSARISFQGbdwaI-UNkjQHNZeIXWGeXC0beBA0167",
+	// 				},
+	// 			}
+	// 		)
+	// 		.then((res) => {
+	// 			console.log(res.data);
+
+	// 			const markdown = googleDocsToMarkdown(res.data);
+	// 			console.log({ markdown });
+	// 			setDocsData(markdown);
+	// 		})
+	// 		.catch((err) => console.log(err));
+
+	// 	// const file = await docs.documents.get({
+	// 	// 	documentId: "1X6bWJXptBwUzVAlyRcCyE82KDrjJlL2wxf2PHn3kQ8k",
+	// 	// 	auth: "AIzaSyAycxIgrLiZOa9chB9bgut3nRXcHPerdyg",
+	// 	// });
+
+	// 	// const markdown = googleDocsToMarkdown(file.data);
+	// 	// console.log(markdown);
+	// };
+
+	// const handleContentSetToDocs = () => {
+	// 	console.log({ currentFileContent });
+
+	// 	fetch(
+	// 		"https://docs.googleapis.com/v1/documents/1X6bWJXptBwUzVAlyRcCyE82KDrjJlL2wxf2PHn3kQ8k:batchUpdate",
+	// 		{
+	// 			method: "POST",
+	// 			headers: {
+	// 				"Content-Type": "text/markdown",
+	// 				Authorization:
+	// 					"Bearer ya29.a0AVvZVsr4SJQojDKK7KapT4hd5E1lpsjSOJrPpqT0RyFdhbJjuKuRC64039uG79HgU0hakOc55EjsEVuvizFy6NxRlYU8Fc14BgEvZVchvrafyj88eLeol8GRWSG7tWarZvLl1Tv_GjxggowQiPRJaIUINPUuaCgYKAa4SARISFQGbdwaI7R625W07hyXpPa6tbD6piA0163",
+	// 			},
+	// 			body: JSON.stringify({
+	// 				request: [
+	// 					{
+	// 						replaceAllText: {
+	// 							replaceText: `${currentFileContent}`,
+	// 						},
+	// 					},
+	// 				],
+	// 			}),
+	// 		}
+	// 	)
+	// 		.then((res) => {
+	// 			console.log(res);
+	// 			// const markdown = googleDocsToMarkdown(res.data);
+	// 			// console.log(markdown);
+	// 		})
+	// 		.catch((err) => console.log(err));
+	// };
 
 	return (
 		<div>
@@ -301,9 +364,9 @@ export const ReactView = () => {
 				))}
 			</div> */}
 			<div style={{ paddingTop: "20px" }}>
-				{/* <button onClick={handleGetCurrentFileContent}>
-					Get Current File Content
-				</button> */}
+				<button onClick={handlePushDocsFromActiveFile}>
+					Push docs from active file
+				</button>
 			</div>
 			{/*<div style={{ border: "1px solid red" }}>
 				<h2>Current File Content</h2>
