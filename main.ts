@@ -4,10 +4,12 @@ import { ExampleView, VIEW_TYPE_EXAMPLE } from "./view";
 
 export default class ExamplePlugin extends Plugin {
 	statusBarTextElement: HTMLSpanElement;
+
 	async onload() {
 		this.addRibbonIcon("dice", "TaskEasy View", () => {
 			this.activateView();
 		});
+
 		this.registerView(VIEW_TYPE_EXAMPLE, (leaf) => new ExampleView(leaf));
 		this.addCommand({
 			id: "display-modal",
@@ -17,6 +19,16 @@ export default class ExamplePlugin extends Plugin {
 					new Notice(`Hello, ${result}!`);
 				}).open();
 			},
+		});
+
+		this.app.workspace.on("file-open", () => {
+			console.log(
+				"Active file changed, reloading plugin...",
+				this.app.workspace.getActiveFile().name
+			);
+
+			!localStorage.getItem(this.app.workspace.getActiveFile().name) &&
+				localStorage.setItem(this.app.workspace.getActiveFile().name, null);
 		});
 
 		//new line count
@@ -71,6 +83,6 @@ export default class ExamplePlugin extends Plugin {
 
 	//Work With Active file:::
 	private async readActiveFileAndGetContent(fileContent?: string) {
-		console.log({ fileContent });
+		// console.log({ fileContent });
 	}
 }

@@ -8,32 +8,39 @@ const markdownIt = require("markdown-it")();
 const oauth2Client = new google.auth.OAuth2();
 const docs = google.docs("v1");
 import * as showdown from "showdown";
+import { authenticateWithGoogle } from "./GoogleAuth";
+import { VIEW_TYPE_EXAMPLE } from "./view";
 
 export const ReactView = () => {
-	const { vault } = useApp();
+	const { vault, workspace } = useApp();
 	const [todos, setTodos] = React.useState([]);
 	const LocalApiToken =
 		"Bearer 4a17f4c3dad7e4ebd00cc68623171a9542bc187a93acdd2ae0418de088ce096b";
-	// React.useEffect(() => {
-	// 	axios("https://jsonplaceholder.typicode.com/todos?_limit=5")
-	// 		.then((res) => {
-	// 			console.log(res.data);
 
-	// 			setTodos(res.data);
-	// 		})
-	// 		.catch((err) => {
-	// 			console.log(err);
-	// 		});
+	React.useEffect(() => {
+		console.log({
+			name: workspace.getActiveFile().name,
+			localName: localStorage.getItem(workspace.getActiveFile().name),
+		});
 
-	// }, []);
+		setFormData({
+			...formData,
+			docId: localStorage.getItem(workspace.getActiveFile().name)
+				? localStorage.getItem(workspace.getActiveFile().name)
+				: null,
+		});
+	}, []);
+	console.log({ fileName: workspace.getActiveFile().name });
+
 	// const response = await fetch("https://jsonplaceholder.typicode.com/todos?_limit=5")
 
+	// const activeFileName = useApp().workspace.getActiveFile().name
+
 	const [formData, setFormData] = React.useState({
-		// docId: null,
-		docId: "1X6bWJXptBwUzVAlyRcCyE82KDrjJlL2wxf2PHn3kQ8k",
-		// accessToken: null,
-		accessToken:
-			"ya29.a0Ael9sCP2PL46Va4ortrkyuYiA6mtmYI3Hfi2mADRtiKrNe0x07jDny4qB33qovclHcZLUrxJuBtOHHVH9gcESsyowf-_CMxD5i2CCA9V15sxBPCrKZK6n_fGzIADX-Ud1oCQ5OtbiTDpCzKhDtOc6_epmKbqaCgYKAb8SARISFQF4udJhokSbcjvUdGIFdW4JBBXzVg0163",
+		docId: null,
+		// docId: "1X6bWJXptBwUzVAlyRcCyE82KDrjJlL2wxf2PHn3kQ8k",
+		accessToken: null,
+		//accessToken:"ya29.a0Ael9sCOzRuUBOsy4FZW7__tK-bvP6kDy5UT2YWGrGLLwT9bQ-HAQtRE1lqAsqaTVM6iWxancbtTJs6wGEdCPxBYss09ixQNRzEbEGNmcrjaWr_KGgxt3pV69UddIrZ_NbeURZ1GobpMSaQUnP4lUx-padqM_aCgYKAbcSARISFQF4udJh6B1tBAWwtmwC6u2dEfFXgA0163",
 	});
 	// const [currentFileContent, setCurrentFileContent] = React.useState("");
 	const [user, setUser] = React.useState(null);
@@ -58,7 +65,7 @@ export const ReactView = () => {
 				},
 			})
 			.then((res) => {
-				console.log(res.data);
+				// console.log(res.data);
 
 				const markdown = googleDocsToMarkdown(res.data);
 				console.log({ markdown });
@@ -96,7 +103,26 @@ export const ReactView = () => {
 	// });
 
 	const handleChangeData = (key: string, value: string) => {
-		setFormData({ ...formData, [key]: value });
+		// setFormData({ ...formData, [key]: value });
+		if (key === "docId") {
+			console.log(workspace.getActiveFile().basename);
+			const localFileName = localStorage.getItem(
+				workspace.getActiveFile().name
+			);
+			console.log({ localFileName });
+			if (localFileName) {
+				setFormData({ ...formData, docId: value });
+			} else {
+				localStorage.setItem(workspace.getActiveFile().name, value);
+				setFormData({ ...formData, docId: value });
+			}
+		} else {
+			setFormData({ ...formData, [key]: value });
+		}
+	};
+	const handleClearForm = () => {
+		setFormData({ docId: null, accessToken: null });
+		localStorage.removeItem(workspace.getActiveFile().name);
 	};
 
 	const handlePushDocsFromActiveFile = () => {
@@ -115,375 +141,50 @@ export const ReactView = () => {
 
 			const htmlContent = markdownIt.render(activeFileRes.data);
 			wrapperDiv.innerHTML = htmlContent;
-			console.log({ wrapperDiv: wrapperDiv.childNodes });
-			for (let i = 0; i < wrapperDiv.childNodes.length; i++) {
-				const iEl = wrapperDiv.childNodes[i];
-				console.log({
-					nodeName: iEl.nodeName,
-					nodeList: iEl.childNodes,
-					node: iEl,
-				});
-				// let updateTextLength = 0;
-				// switch (iEl.nodeName) {
-				// 	case "#text":
-				// 		updateRequest.push({
-				// 			insertText: {
-				// 				text: iEl.nodeValue,
-				// 				//   location: {index: 1},
-				// 				endOfSegmentLocation: {},
-				// 			},
-				// 		});
-				// 		updateTextLength += iEl.textContent?.length;
-				// 		break;
-				// 	case "P":
-				// 		for (let j = 0; j < iEl.childNodes.length; j++) {
-				// 			const pEl = iEl.childNodes[j];
-				// 			switch (pEl.nodeName) {
-				// 				case "#text":
-				// 					updateRequest.push({
-				// 						insertText: {
-				// 							text: pEl.nodeValue,
-				// 							//   location: {index: 1},
-				// 							endOfSegmentLocation: {},
-				// 						},
-				// 					});
-				// 					updateTextLength += pEl.nodeValue?.length;
-				// 					break;
-				// 				case "EM":
-				// 					updateRequest.push({
-				// 						insertText: {
-				// 							text: pEl?.outerText,
-				// 							//   location: {index: 1},
-				// 							endOfSegmentLocation: {},
-				// 						},
-				// 					});
-				// 					updateTextLength += pEl.textContent?.length;
-
-				// 					break;
-				// 				default:
-				// 					break;
-				// 			}
-				// 		}
-				// 		updateRequest.push({
-				// 			insertText: {
-				// 				text: iEl.nodeValue,
-				// 				endOfSegmentLocation: {},
-				// 			},
-				// 		});
-				// 		break;
-
-				// 	default:
-				// 		break;
-				// }
-			}
-
-			const docContent = {
-				requests: [
-					{
-						insertText: {
-							location: {
-								index: 1,
-							},
-							text: "",
-						},
-					},
-				],
-			};
-
-			// Apply formatting to the text
-			const formattedHtmlContent = htmlContent.replace(
-				/<\/?(h\d|strong|em)>/gi,
-				(match) => {
-					switch (match.toLowerCase()) {
-						case "<h1>":
-							return "<paragraph><bullet><textStyle><bold>";
-						case "<h2>":
-							return "<paragraph><bullet><textStyle><italic>";
-						case "<h3>":
-							return "<paragraph><textStyle><smallCaps>";
-						case "<strong>":
-							return "<textStyle><bold>";
-						case "<em>":
-							return "<textStyle><italic>";
-						case "</h1>":
-						case "</h2>":
-						case "</h3>":
-						case "</strong>":
-						case "</em>":
-							return "</textStyle></bullet></paragraph>";
-						default:
-							return match;
-					}
-				}
-			);
-
-			// Split the formatted HTML content into chunks of up to 100000 characters
-			const chunks = formattedHtmlContent.match(/.{1,100000}/g);
-
-			// Append each chunk to the docContent variable
-			chunks.forEach((chunk) => {
-				console.log(chunk);
-
-				docContent.requests.push({
-					insertText: {
-						location: {
-							index: -1,
-						},
-						text: chunk,
-					},
-				});
-			});
-
+			console.log({ wrapperDiv: wrapperDiv.innerHTML, div: wrapperDiv });
 			axios
-				.get(`https://docs.googleapis.com/v1/documents/${formData.docId}`, {
-					headers: {
-						Authorization: `Bearer ${formData.accessToken}`,
+				.post(
+					"https://script.google.com/macros/s/AKfycbyqy8xIhAK05QPCvzAEqkEZLmLDzYZ3U-59OBZG4zg/dev",
+					{
+						strHtml: `<div>${wrapperDiv.innerHTML}</div>`,
 					},
-				})
+					{
+						headers: {
+							Authorization: `Bearer ${formData.accessToken}`,
+							"Access-Control-Allow-Origin": "*",
+						},
+					}
+				)
 				.then((res) => {
-					axios
-						.post(
-							`https://docs.googleapis.com/v1/documents/${formData.docId}:batchUpdate`,
-							{
-								requests: [
-									{
-										deleteContentRange: {
-											range: {
-												startIndex: 1,
-												// endIndex: {
-												// 	endOfDocument: true,
-												// },
-												endIndex:
-													res.data.body.content[
-														res.data.body.content.length - 1
-													].endIndex - 1,
-											},
-										},
-									},
-									{
-										insertText: {
-											text: "This is ", //8
-											//   location: {index: 1},
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										insertText: {
-											text: "bold text", //9-17
-											//   location: {index: 1},
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										updateTextStyle: {
-											range: {
-												startIndex: 9,
-												endIndex: 18,
-											},
-											textStyle: {
-												bold: true,
-											},
-											fields: "bold",
-										},
-									},
-									{
-										insertText: {
-											text: "\n", //17-18
-											//   location: {index: 1},
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										updateTextStyle: {
-											range: {
-												startIndex: 18,
-												endIndex: 19,
-											},
-											textStyle: {
-												bold: false,
-												italic: false,
-											},
-											fields: "*",
-										},
-									},
-									{
-										insertText: {
-											text: "This is ", //19-26
-											//   location: {index: 19},
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										updateTextStyle: {
-											range: {
-												startIndex: 19,
-												endIndex: 27,
-											},
-											textStyle: {
-												bold: false,
-												italic: false,
-											},
-											fields: "*",
-										},
-									},
-									{
-										insertText: {
-											text: "Italic", //27-32
-											//   location: {index: 19},
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										updateTextStyle: {
-											range: {
-												startIndex: 27,
-												endIndex: 33,
-											},
-											textStyle: {
-												bold: true,
-											},
-											fields: "bold",
-										},
-									},
-									{
-										updateTextStyle: {
-											range: {
-												startIndex: 27,
-												endIndex: 33,
-											},
-											textStyle: {
-												italic: true,
-											},
-											fields: "italic",
-										},
-									},
-									{
-										insertText: {
-											text: " text", //33-38
-											//   location: {index: 19},
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										updateTextStyle: {
-											range: {
-												startIndex: 34,
-												endIndex: 39,
-											},
-											textStyle: {
-												bold: false,
-												italic: false,
-											},
-											fields: "*",
-										},
-									},
-									{
-										insertText: {
-											text: "\n", //39-40
-											//   location: {index: 19},
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										updateTextStyle: {
-											range: {
-												startIndex: 39,
-												endIndex: 40,
-											},
-											textStyle: {
-												bold: false,
-												italic: false,
-											},
-											fields: "*",
-										},
-									},
-									{
-										insertText: {
-											text: "list 1", //40-45
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										insertText: {
-											text: "\n", //45-46
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										insertText: {
-											text: "list 2", //46-51
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										insertText: {
-											text: "\n", //51-52
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										insertText: {
-											text: "nested 1", //52-60
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										insertText: {
-											text: "\n", //60-61
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										insertText: {
-											text: "\n", //61-62
-											endOfSegmentLocation: {},
-										},
-									},
-									{
-										createParagraphBullets: {
-											range: {
-												startIndex: 40,
-												endIndex: 61,
-											},
-											// bulletPreset: "BULLET_ARROW_DIAMOND_DISC",
-											bulletPreset: "BULLET_DISC_CIRCLE_SQUARE",
-										},
-									},
-									{
-										updateTextStyle: {
-											range: {
-												startIndex: 40,
-												endIndex: 46,
-											},
-											textStyle: {
-												bold: true,
-												italic: false,
-												underline: false,
-											},
-											fields: "*",
-										},
-									},
-
-									{
-										insertText: {
-											text: "dfffg\n", //33-38
-											endOfSegmentLocation: {},
-										},
-									},
-								],
-							},
-							{
-								headers: {
-									Authorization: `Bearer ${formData.accessToken}`,
-								},
-							}
-						)
-						.then((docsRes) => {
-							console.log(docsRes.data);
-						})
-						.catch((err) => console.log(err));
+					console.log(res.data);
 				})
 				.catch((err) => console.log(err));
+
+			// axios
+			// 	.get(`https://docs.googleapis.com/v1/documents/${formData.docId}`, {
+			// 		headers: {
+			// 			Authorization: `Bearer ${formData.accessToken}`,
+			// 		},
+			// 	})
+			// 	.then((res) => {
+			// 		axios
+			// 			.post(
+			// 				`https://docs.googleapis.com/v1/documents/${formData.docId}:batchUpdate`,
+			// 				{
+			// 					requests: [],
+			// 				},
+			// 				{
+			// 					headers: {
+			// 						Authorization: `Bearer ${formData.accessToken}`,
+			// 					},
+			// 				}
+			// 			)
+			// 			.then((docsRes) => {
+			// 				console.log(docsRes.data);
+			// 			})
+			// 			.catch((err) => console.log(err));
+			// 	})
+			// 	.catch((err) => console.log(err));
 		});
 	};
 
@@ -589,9 +290,26 @@ export const ReactView = () => {
 	// 		.catch((err) => console.log(err));
 	// };
 
+	const handleGoogleAuth = async () => {
+		const client = await authenticateWithGoogle();
+		console.log("Authenticated with Google:", client);
+	};
+
 	return (
 		<div>
+			<button onClick={handleGoogleAuth}>Continue with Google</button>
 			<h4>{vault.getName()}</h4>
+
+			<div
+				style={{
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+					paddingBottom: "10px",
+				}}
+			>
+				<button onClick={handleClearForm}>Clear Form</button>
+			</div>
 			{user === null ? (
 				<form
 					action=""
@@ -613,13 +331,15 @@ export const ReactView = () => {
 						}}
 					>
 						<label htmlFor="docId">Document id:</label>
+
 						<input
 							style={{ width: "100%" }}
 							type="text"
 							id="docId"
 							required
 							placeholder="Enter document id"
-							onChange={(e) => handleChangeData("docId", e.target.value)}
+							value={formData.docId}
+							onBlur={(e) => handleChangeData("docId", e.target.value)}
 						/>
 					</div>
 					<div
@@ -638,9 +358,10 @@ export const ReactView = () => {
 							id="accessToken"
 							required
 							placeholder="Enter access token"
-							onChange={(e) => handleChangeData("accessToken", e.target.value)}
+							onBlur={(e) => handleChangeData("accessToken", e.target.value)}
 						/>
 					</div>
+
 					<div
 						style={{
 							display: "flex",
