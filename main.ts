@@ -1,6 +1,7 @@
 import { Notice, Plugin } from "obsidian";
 import { ExampleModal } from "./modal";
 import { ExampleView, VIEW_TYPE_EXAMPLE } from "./view";
+import { ReactView } from "./ReactView";
 
 export default class ExamplePlugin extends Plugin {
 	statusBarTextElement: HTMLSpanElement;
@@ -21,15 +22,12 @@ export default class ExamplePlugin extends Plugin {
 			},
 		});
 
-		this.app.workspace.on("file-open", () => {
-			console.log(
-				"Active file changed, reloading plugin...",
-				this.app.workspace.getActiveFile().name
-			);
-
-			!localStorage.getItem(this.app.workspace.getActiveFile().name) &&
-				localStorage.setItem(this.app.workspace.getActiveFile().name, null);
-		});
+		// this.app.workspace.on("file-open", () => {
+		// 	console.log(
+		// 		"Active file changed, reloading plugin...",
+		// 		this.app.workspace.getActiveFile().name
+		// 	);
+		// });
 
 		//new line count
 		this.statusBarTextElement = this.addStatusBarItem().createEl("span");

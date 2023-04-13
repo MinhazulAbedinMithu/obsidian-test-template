@@ -17,20 +17,32 @@ export const ReactView = () => {
 	const LocalApiToken =
 		"Bearer 4a17f4c3dad7e4ebd00cc68623171a9542bc187a93acdd2ae0418de088ce096b";
 
-	React.useEffect(() => {
-		console.log({
-			name: workspace.getActiveFile().name,
-			localName: localStorage.getItem(workspace.getActiveFile().name),
-		});
+	// React.useEffect(() => {
+	// 	console.log({
+	// 		name: workspace.getActiveFile().name,
+	// 		localName: localStorage.getItem(workspace.getActiveFile().name),
+	// 	});
 
+	// 	setFormData({
+	// 		...formData,
+	// 		docId: localStorage.getItem(workspace.getActiveFile().name)
+	// 			? localStorage.getItem(workspace.getActiveFile().name)
+	// 			: null,
+	// 	});
+	// }, []);
+
+	workspace.on("file-open", () => {
+		console.log(
+			"Inplugin Active file changed, reloading plugin...",
+			workspace.getActiveFile().name
+		);
 		setFormData({
 			...formData,
 			docId: localStorage.getItem(workspace.getActiveFile().name)
 				? localStorage.getItem(workspace.getActiveFile().name)
 				: null,
 		});
-	}, []);
-	console.log({ fileName: workspace.getActiveFile().name });
+	});
 
 	// const response = await fetch("https://jsonplaceholder.typicode.com/todos?_limit=5")
 
@@ -144,9 +156,10 @@ export const ReactView = () => {
 			console.log({ wrapperDiv: wrapperDiv.innerHTML, div: wrapperDiv });
 			axios
 				.post(
-					"https://script.google.com/macros/s/AKfycbyqy8xIhAK05QPCvzAEqkEZLmLDzYZ3U-59OBZG4zg/dev",
+					"https://api-beta.taskeasy.io/api/call-to-google",
 					{
 						strHtml: `<div>${wrapperDiv.innerHTML}</div>`,
+						docId: formData.docId,
 					},
 					{
 						headers: {
