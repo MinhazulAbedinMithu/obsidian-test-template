@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
 	"id": "obsidian-sample-plugin",
 	"name": "Taskeasy Plugin",
@@ -9,3 +10,16 @@
 	"fundingUrl": "https://obsidian.md/pricing",
 	"isDesktopOnly": false
 }
+=======
+{
+	"id": "obsidian-sample-plugin",
+	"name": "Taskeasy Plugin",
+	"version": "2.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "This is a sample plugin for Obsidian. This plugin demonstrates some of the capabilities of the Obsidian API.",
+	"author": "Minhaz",
+	"authorUrl": "https://obsidian.md",
+	"fundingUrl": "https://obsidian.md/pricing",
+	"isDesktopOnly": false
+}
+>>>>>>> 4f3c890104919e41bdbb1385ed5fafaeac1714fc

@@ -1,1 +1,7 @@
+<<<<<<< HEAD
 ./main.js
+=======
+node_modules/
+
+main.js
+>>>>>>> 4f3c890104919e41bdbb1385ed5fafaeac1714fc

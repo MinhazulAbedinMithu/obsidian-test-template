@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
 
 This CSS file will be included with your plugin, and
@@ -9,3 +10,16 @@ If your plugin does not need CSS, delete this file.
 /* body {
 	color: rgb(173, 204, 0);
 } */
+=======
+/*
+
+This CSS file will be included with your plugin, and
+available in the app when your plugin is enabled.
+
+If your plugin does not need CSS, delete this file.
+
+*/
+/* body {
+	color: rgb(173, 204, 0);
+} */
+>>>>>>> 4f3c890104919e41bdbb1385ed5fafaeac1714fc
