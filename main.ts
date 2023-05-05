@@ -1,13 +1,16 @@
 import { Notice, Plugin } from "obsidian";
 import { ExampleModal } from "./modal";
 import { ExampleView, VIEW_TYPE_EXAMPLE } from "./view";
+import { ReactView } from "./ReactView";
 
 export default class ExamplePlugin extends Plugin {
 	statusBarTextElement: HTMLSpanElement;
+
 	async onload() {
 		this.addRibbonIcon("dice", "TaskEasy View", () => {
 			this.activateView();
 		});
+
 		this.registerView(VIEW_TYPE_EXAMPLE, (leaf) => new ExampleView(leaf));
 		this.addCommand({
 			id: "display-modal",
@@ -18,6 +21,13 @@ export default class ExamplePlugin extends Plugin {
 				}).open();
 			},
 		});
+
+		// this.app.workspace.on("file-open", () => {
+		// 	console.log(
+		// 		"Active file changed, reloading plugin...",
+		// 		this.app.workspace.getActiveFile().name
+		// 	);
+		// });
 
 		//new line count
 		this.statusBarTextElement = this.addStatusBarItem().createEl("span");
@@ -71,6 +81,6 @@ export default class ExamplePlugin extends Plugin {
 
 	//Work With Active file:::
 	private async readActiveFileAndGetContent(fileContent?: string) {
-		console.log({ fileContent });
+		// console.log({ fileContent });
 	}
 }

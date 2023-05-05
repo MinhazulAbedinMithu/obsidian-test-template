@@ -3,6 +3,9 @@ export const demoRequest = [
 		deleteContentRange: {
 			range: {
 				startIndex: 1,
+				// endIndex: {
+				// 	endOfDocument: true,
+				// },
 				endIndex:
 					res.data.body.content[res.data.body.content.length - 1].endIndex - 1,
 			},
@@ -123,6 +126,99 @@ export const demoRequest = [
 				italic: false,
 			},
 			fields: "*",
+		},
+	},
+	{
+		insertText: {
+			text: "\n", //39-40
+			//   location: {index: 19},
+			endOfSegmentLocation: {},
+		},
+	},
+	{
+		updateTextStyle: {
+			range: {
+				startIndex: 39,
+				endIndex: 40,
+			},
+			textStyle: {
+				bold: false,
+				italic: false,
+			},
+			fields: "*",
+		},
+	},
+	{
+		insertText: {
+			text: "list 1", //40-45
+			endOfSegmentLocation: {},
+		},
+	},
+	{
+		insertText: {
+			text: "\n", //45-46
+			endOfSegmentLocation: {},
+		},
+	},
+	{
+		insertText: {
+			text: "list 2", //46-51
+			endOfSegmentLocation: {},
+		},
+	},
+	{
+		insertText: {
+			text: "\n", //51-52
+			endOfSegmentLocation: {},
+		},
+	},
+	{
+		insertText: {
+			text: "nested 1", //52-60
+			endOfSegmentLocation: {},
+		},
+	},
+	{
+		insertText: {
+			text: "\n", //60-61
+			endOfSegmentLocation: {},
+		},
+	},
+	{
+		insertText: {
+			text: "\n", //61-62
+			endOfSegmentLocation: {},
+		},
+	},
+	{
+		createParagraphBullets: {
+			range: {
+				startIndex: 40,
+				endIndex: 61,
+			},
+			// bulletPreset: "BULLET_ARROW_DIAMOND_DISC",
+			bulletPreset: "BULLET_DISC_CIRCLE_SQUARE",
+		},
+	},
+	{
+		updateTextStyle: {
+			range: {
+				startIndex: 40,
+				endIndex: 46,
+			},
+			textStyle: {
+				bold: true,
+				italic: false,
+				underline: false,
+			},
+			fields: "*",
+		},
+	},
+
+	{
+		insertText: {
+			text: "dfffg\n", //33-38
+			endOfSegmentLocation: {},
 		},
 	},
 ];

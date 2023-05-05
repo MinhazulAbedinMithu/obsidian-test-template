@@ -22,6 +22,7 @@ export class ExampleView extends ItemView {
 
 	async onOpen() {
 		const root = createRoot(this.containerEl.children[1]);
+
 		root.render(
 			<React.StrictMode>
 				<AppContext.Provider value={this.app}>
